@@ -153,3 +153,52 @@ Create a Serverless Database - How we can build and deploy DynamoDB
   custom:
     tableName: player-points
   ```
+
+
+### CHAPTER 6 ###
+-------------------------
+Create an API to get data from DynamoDB
+- Configure our project by adding common and endpoints directory and move API_Responses into it.
+- make new js file name getPlayerScore.js
+
+```
+const Responses = require('../common/API_Responses')
+const Dynamo = require('../common/Dynamo')
+const tableName = process.env.tableName
+
+exports.handler = async event => {
+    if(!event.pathParameters || !event.pathParameters.ID){
+        //failed with id
+        return Responses._400({message: 'Missing the ID from the path'})
+    }
+    let ID = event.pathParameters.ID;
+    const user = await Dynamo.get(ID, tableName).catch(err => {
+        console.log('error in dynamo db', err)
+    })
+
+    if(!user){
+        return Responses._400({message: 'Failed to get user'})
+    }
+    return Responses._200({ user })
+};
+```
+
+- setup yml file in provider array and in functions
+  ```
+  environment:
+    tableName: ${self:custom.tableName}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: '*'
+
+  getPlayerScore:
+    handler: lambdas/endpoints/getPlayerScore.handler
+    events:
+      - http:
+          path: get-player-score/{ID}
+          method: get
+          cors: true
+
+  ```
