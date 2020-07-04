@@ -12,9 +12,6 @@ Setup IAM Role and System Configuration
   Serverless SETUP
     - npm i -g serverless
     - sls config credentials --provider aws --key aws_key --secret aws_secret --profile serverless-admin (SAME Name of IAM User)
-
-    eg:
-        sls config credentials --provider aws --key AKIAUDCONGQBWNMEBI3B --secret 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 --profile serverless-admin
        
 - Create Template
     - sls create -t aws-nodejs 
